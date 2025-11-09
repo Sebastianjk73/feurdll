@@ -6,11 +6,11 @@
 		"mac": "2.2074",
 		"ios": "2.2074"
 	},
-	"id": "jeantasoeur.feurdll",
-	"name": "FeurDLL",
+	"id": "mymod.placeholder",
+	"name": "test",
 	"version": "v1.0.0",
-	"developer": "Jean",
-	"description": "you have been dinde",
+	"developer": "SebastianYY",
+	"description": "hi",
 	"resources": {
 		"sprites": [
 			"resources/dl.png"
