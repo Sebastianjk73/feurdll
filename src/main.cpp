@@ -95,59 +95,6 @@ class $modify(MyMenuLayer, MenuLayer) {
 	 * return type `void` and taking a `CCObject*`.
 	*/
 	void onMyButton(CCObject*) {
-		FLAlertLayer::create("Eres muy fea", "Zuly fra", "Fea")->show();
+		FLAlertLayer::create("Geode", "Hello from my custom mod!", "OK")->show();
 	}
-};
-
-#include <Geode/Geode.hpp>
-#include <Geode/modify/MenuLayer.hpp> 
-
-using namespace geode::prelude;
-
-// --- 1. FUNCIÓN DE RESPUESTA DEL BOTÓN ---
-// Esta función se ejecuta cuando el usuario toca el botón.
-void onHelloButton(CCObject* sender) {
-    // Muestra un mensaje pop-up en el juego (es una función de Geode/Cocos2d)
-    FLAlertLayer::create("Mi Mod Personal", "¡Hola desde mi mod hecho en Android!", "OK")->show();
-}
-
-
-// --- 2. EL GANCHO ($modify) ---
-// Hookeamos el MenuLayer para añadir nuestro botón.
-class $modify(MyMenuLayer, MenuLayer) {
-    
-    // Hookeamos la función 'init' que se ejecuta al cargar el menú.
-    bool init() {
-        // Llama a la función 'init' original. ¡ES OBLIGATORIO!
-        if (!MenuLayer::init()) {
-            return false;
-        }
-
-        // --- CÓDIGO PARA AÑADIR EL BOTÓN ---
-        
-        // 3. Crear el objeto visual (texto "HOLA")
-        auto buttonSprite = CCLabelTTF::create("HOLA", "Arial", 20.0f); 
-
-        // 4. Crear el botón interactivo (CCMenuItemSpriteExtra)
-        auto myButton = CCMenuItemSpriteExtra::create(
-            buttonSprite, // Usamos el texto como la imagen del botón
-            this,         // El objeto que tiene la función (esta clase)
-            menu_selector(onHelloButton) // La función que llamará
-        );
-
-        // 5. Obtener la capa del menú existente para añadir nuestro botón
-        auto menu = this->getChildByID("main-menu-node"); 
-
-        // 6. Añadir el botón al menú
-        menu->addChild(myButton);
-        
-        // 7. Colocar el botón en una posición visible (ej. en la esquina inferior izquierda)
-        myButton->setPosition({-100.0f, -100.0f}); 
-
-        // ---------------------------------
-
-        log::info("Botón 'HOLA' añadido al menú principal.");
-        
-        return true;
-    }
 };
