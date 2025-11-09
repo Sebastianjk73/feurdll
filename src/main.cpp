@@ -2,8 +2,7 @@
  * Include the Geode headers.
  */
 #include <Geode/Geode.hpp>
-#include <Geode/utils/web.hpp>
-#include <Geode/utils/casts.hpp>
+
 /**
  * Brings cocos2d and all Geode namespaces to the current scope.
  */
@@ -55,7 +54,7 @@ class $modify(MyMenuLayer, MenuLayer) {
 		 * https://docs.geode-sdk.org/tutorials/buttons
 		*/
 		auto myButton = CCMenuItemSpriteExtra::create(
-			CCSprite::createWithSpriteFrameName("GJ_gpgBtn_001.png"),
+			CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png"),
 			this,
 			/**
 			 * Here we use the name we set earlier for our modify class.
@@ -96,174 +95,6 @@ class $modify(MyMenuLayer, MenuLayer) {
 	 * return type `void` and taking a `CCObject*`.
 	*/
 	void onMyButton(CCObject*) {
-		web::openLinkInBrowser("https://gdps.dimisaio.be/");
+		FLAlertLayer::create("Geode", "Hello from my custom mod!", "OK")->show();
 	}
-
-	void onMoreGames(CCObject*) {
-		web::openLinkInBrowser("https://gdps.dimisaio.be/moregames.html");
-	} 
-};
-
-// Taken from the SecretLayer6 mod, I'm sorry
-// and geode docs kms
-#include <Geode/modify/SecretLayer5.hpp>
-#include <Geode/loader/Event.hpp>
-class $modify(MySecretLayer5, SecretLayer5) {
-
-	struct Fields {
-        	EventListener<web::WebTask> m_listener;
-    	};
-
-	void onSubmit(CCObject * sender) {
-		std::string text = this->m_textInput->getString();
-		std::transform(
-			text.begin(),
-			text.end(),
-			text.begin(),
-			[](unsigned char c) {
-				return std::tolower(c);
-			}
-		);
-
-		m_fields->m_listener.bind([] (web::WebTask::Event* e) {
-		    if (web::WebResponse* res = e->getValue()) {
-			std::string tesla = res->string().unwrapOr("0");
-			if(tesla != "0") {
-				web::openLinkInBrowser(tesla);
-				return;
-			}
-		    } else if (web::WebProgress* p = e->getProgress()) {
-			log::info("progress: {}", p->downloadProgress().value_or(0.f));
-		    } else if (e->isCancelled()) {
-			log::info("The request was cancelled... So sad :(");
-		    }
-		});
-
-	        auto req = web::WebRequest();
-	        // Let's fetch... uhh...
-			std::string url = "https://gdps.dimisaio.be/database/getTesla.php?key=";
-			url += text;
-	        m_fields->m_listener.setFilter(req.get(url));
-
-		SecretLayer5::onSubmit(sender);
-	}
-};
-
-#include <Geode/modify/CreatorLayer.hpp>
-class $modify(MyCreatorLayer, CreatorLayer) {
-    struct Fields {
-        bool m_demonlistButton = true;
-    };
-
-    bool init() override {
-        if (!CreatorLayer::init()) return false;
-
-        auto menu = static_cast<CCMenu*>(this->getChildByID("creator-buttons-menu"));
-        if (!menu) return true;
-
-        auto mapBtn = static_cast<CCMenuItemSpriteExtra*>(menu->getChildByID("versus-button"));
-        if (mapBtn) mapBtn->setVisible(false);
-
-        auto versus = CCSprite::create("dl.png"_spr);
-        versus->setScale(0.85f);
-
-        auto versusBtn = CCMenuItemSpriteExtra::create(
-            versus,
-            nullptr,
-            this,
-            menu_selector(MyCreatorLayer::onVersus)
-        );
-        versusBtn->setID("demonlist-button");
-
-		versusBtn->setPosition(mapBtn->getPositionX() + 2.f, mapBtn->getPositionY() - 2.f);
-
-        menu->addChild(versusBtn);
-        return true;
-    }
-
-    void onVersus(CCObject*) {
-        if (!m_fields->m_demonlistButton) return;
-
-        // Open custom search type
-        auto searchObj = GJSearchObject::create(static_cast<SearchType>(3142), "");
-        auto browser = LevelBrowserLayer::create(searchObj);
-
-        auto scene = CCScene::create();
-        scene->addChild(browser);
-
-        CCDirector::sharedDirector()->pushScene(
-            CCTransitionFade::create(0.5f, scene)
-        );
-    }
-};
-
-inline int beatLevel = 0;
-// sse2 did this so will i
-std::string gLastPlayedTrack;
-std::string gLastRedirectedTrack;
-std::string gLastPlayedEffect;
-std::string gLastRedirectedEffect;
-std::string player = "menuLoop1.mp3";
-
-// warbled completions by ery
-#include <Geode/modify/EndLevelLayer.hpp>
-class $modify(CustomEndLevelLayer, EndLevelLayer) {
-	static void onModify(auto& self) {
-		(void)self.setHookPriority("EndLevelLayer::customSetup", -3999);
-	}
-    void customSetup() {
-        // call the original init first
-        EndLevelLayer::customSetup();
-
-        auto pl = m_playLayer;
-        // check if this was a proper completion (not test or practice)
-		if (!pl || !pl->m_level || !m_mainLayer) return;
-        if (!pl->m_isPracticeMode && !pl->m_isTestMode) {
-			if(pl->m_level->m_demon) player = pl->m_level->m_demonDifficulty >= 5 ? "menuLoop3.mp3" : "menuLoop2.mp3";
-			else player = "menuLoop1.mp3";
-            beatLevel = 2;
-        } else {
-            beatLevel = 0;
-        }
-		log::info("beatLevel state when on finish called: {}", beatLevel);
-    }
-};
-
-#include <Geode/modify/FMODAudioEngine.hpp>
-// sse2/gd-music-manager
-// clang-format off
-class $modify ( FMODAudioEngine ) {
-  // all music passes through here, some might pass more than once per play which leads to some songs fucking up the fade in (menuLoop)
-  void loadMusic ( gd::string p0, float p1, float p2, float p3, bool p4, int p5, int p6, bool p7 ) {
-    // there isn't a last playing track or it isn't one we redirected
-    if ( gLastPlayedTrack.empty ( ) || ( gLastPlayedTrack != std::string { p0 } && std::string { p0 }.find ( "music-manager\\" ) == std::string::npos ) ) {
-      gLastPlayedTrack = p0;
-    }
-  
-    return this->FMODAudioEngine::loadMusic ( p0, p1, p2, p3, p4, p5, p6, p7 );
-  }
-  
-  // todo; refactor and add support for sfx, should look into 3.0 bindings
-  void playMusic ( gd::string p0, bool p1, float p2, int p3 )
-  {
-   // there is a last playing track and it is the one we just redirected
-   if ( !gLastPlayedTrack.empty ( ) && gLastPlayedTrack == std::string { p0 } )
-    return; // not calling original here prevents fading in when going back to the title screen. maybe it causes other issues but didn't see anything
-  
-   gLastPlayedTrack = p0.data ( );
-   log::info("beatLevel state when playMusic called: {}", beatLevel);
-
-   // redirecting this track, if possible
-   if ( beatLevel > 0 )
-   {
-    // pick a random file in directory - to note; the path is relative to the Resources folder here, but our current, actual, path used by std::filesystem is the GD directory
-    // therefore some extra string processing is required here...
-    gLastRedirectedTrack = player;
-	beatLevel--;
-  
-    return this->FMODAudioEngine::playMusic ( player, p1, p2, p3 );
-   }
-  
-   return this->FMODAudioEngine::playMusic ( p0, p1, p2, p3 );
-  }
 };
