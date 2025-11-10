@@ -33,29 +33,30 @@ class $modify(MyMenuLayer, MenuLayer) {
 	 * Note that for all hooks, your signature has to *match exactly*,
 	 * `void init()` would not place a hook!
 	*/
-	bool init() {// ... código de cabecera ...
+	bool init() {
+    string word = "hello";
 
-class $modify(MyMenuLayer, MenuLayer) {
-    
-    bool init() {
-        // --- 1. ZONA PROHIBIDA: CÓDIGO ORIGINAL DEL JUEGO ---
-        if (!MenuLayer::init()) {
-            return false;
-        }
+    if (word == "hi")
 
-        // --- 2. ZONA SEGURA: ¡AQUÍ VA TU CÓDIGO! ---
-        
-        // EJEMPLO 1: Muestra un mensaje en la consola de Geode
-        log::info("Mi mod está modificando este menú!");
+        cout << "greeting";
 
-        // EJEMPLO 2: Tu código para crear botones, cambiar colores, etc.
-        // auto myButton = ... (código para crear el botón)
-        
-        // ----------------------------------------
-        
-        return true;
+    else {
+
+        word = word + "!";
+
+        cout << word;
+
     }
-};
+
+    return 0;
+
+}
+
+
+
+
+
+
 		/**
 		 * We call the original init function so that the
 		 * original class is properly initialized.
