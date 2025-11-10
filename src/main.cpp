@@ -34,29 +34,6 @@ class $modify(MyMenuLayer, MenuLayer) {
 	 * `void init()` would not place a hook!
 	*/
 	bool init() {
-    string word = "hello";
-
-    if (word == "hi")
-
-        cout << "greeting";
-
-    else {
-
-        word = word + "!";
-
-        cout << word;
-
-    }
-
-    return 0;
-
-}
-
-
-
-
-
-
 		/**
 		 * We call the original init function so that the
 		 * original class is properly initialized.
